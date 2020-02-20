@@ -41,8 +41,20 @@ func upload(ctx context.Context, opts *Options) (string, error) {
 		"altool",
 		"--notarize-app",
 		"--primary-bundle-id", opts.BundleId,
-		"-u", opts.Username,
-		"-p", opts.Password,
+	}
+
+	if len(opts.Username) > 0 {
+		cmd.Args = append(cmd.Args,
+			"-u", opts.Username,
+			"-p", opts.Password,
+		)
+	}
+
+	if len(opts.APIKey) > 0 {
+		cmd.Args = append(cmd.Args,
+			"--apiKey", opts.APIKey,
+			"--apiIssuer", opts.APIIssuer,
+		)
 	}
 
 	if opts.Provider != "" {
