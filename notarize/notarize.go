@@ -27,6 +27,15 @@ type Options struct {
 	// read from the keychain and environment variables, respectively.
 	Password string
 
+	// APIKey is required for JWT authentication while using validation, upload, and notarization.
+	// This option will search the following directories in sequence for a private key file
+	// with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys',
+	// and '~/.appstoreconnect/private_keys'.
+	APIKey string
+
+	//APIIssuer is Issuer ID. Required if --apiKey is specified.
+	APIIssuer string
+
 	// Provider is the Apple Connect provider to use. This is optional
 	// and is only used for Apple Connect accounts that support multiple
 	// providers.

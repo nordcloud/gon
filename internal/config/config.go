@@ -47,6 +47,15 @@ type AppleId struct {
 	// specified if you're using an Apple ID account that has multiple
 	// teams.
 	Provider string `hcl:"provider,optional"`
+
+	// APIKey is required for JWT authentication while using validation, upload, and notarization.
+	// This option will search the following directories in sequence for a private key file
+	// with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys',
+	// and '~/.appstoreconnect/private_keys'.
+	APIKey string `hcl:"api_key,optional"`
+
+	//APIIssuer is Issuer ID. Required if --apiKey is specified.
+	APIIssuer string `hcl:"api_issuer,optional"`
 }
 
 // Notarize are the options for notarizing a pre-built file.

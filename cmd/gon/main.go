@@ -145,31 +145,43 @@ func realMain() int {
 	if cfg.AppleId == nil {
 		cfg.AppleId = &config.AppleId{}
 	}
-	if cfg.AppleId.Username == "" {
-		appleIdUsername, ok := os.LookupEnv("AC_USERNAME")
-		if !ok {
-			color.New(color.Bold, color.FgRed).Fprintf(os.Stdout, "❗️ No apple_id username provided\n")
-			color.New(color.FgRed).Fprintf(os.Stdout,
-				"An Apple ID username must be specified in the `apple_id` block or\n"+
-					"it must exist in the environment as AC_USERNAME,\n"+
-					"otherwise we won't be able to authenticate with Apple to notarize.\n")
+
+	if len(cfg.AppleId.APIKey) > 0 || len(cfg.AppleId.APIIssuer) > 0 {
+		if cfg.AppleId.APIKey == "" {
+			color.New(color.Bold, color.FgRed).Fprintf(os.Stdout, "❗️ No api_key provided, but used api_issuer\n")
 			return 1
 		}
-
-		cfg.AppleId.Username = appleIdUsername
-	}
-
-	if cfg.AppleId.Password == "" {
-		if _, ok := os.LookupEnv("AC_PASSWORD"); !ok {
-			color.New(color.Bold, color.FgRed).Fprintf(os.Stdout, "❗️ No apple_id password provided\n")
-			color.New(color.FgRed).Fprintf(os.Stdout,
-				"An Apple ID password (or lookup directive) must be specified in the\n"+
-					"`apple_id` block or it must exist in the environment as AC_PASSWORD,\n"+
-					"otherwise we won't be able to authenticate with Apple to notarize.\n")
+		if cfg.AppleId.APIIssuer == "" {
+			color.New(color.Bold, color.FgRed).Fprintf(os.Stdout, "❗️ No api_issuer provided\n")
 			return 1
 		}
+	} else {
+		if cfg.AppleId.Username == "" {
+			appleIdUsername, ok := os.LookupEnv("AC_USERNAME")
+			if !ok {
+				color.New(color.Bold, color.FgRed).Fprintf(os.Stdout, "❗️ No apple_id username provided\n")
+				color.New(color.FgRed).Fprintf(os.Stdout,
+					"An Apple ID username must be specified in the `apple_id` block or\n"+
+						"it must exist in the environment as AC_USERNAME,\n"+
+						"otherwise we won't be able to authenticate with Apple to notarize.\n")
+				return 1
+			}
 
-		cfg.AppleId.Password = "@env:AC_PASSWORD"
+			cfg.AppleId.Username = appleIdUsername
+		}
+
+		if cfg.AppleId.Password == "" {
+			if _, ok := os.LookupEnv("AC_PASSWORD"); !ok {
+				color.New(color.Bold, color.FgRed).Fprintf(os.Stdout, "❗️ No apple_id password provided\n")
+				color.New(color.FgRed).Fprintf(os.Stdout,
+					"An Apple ID password (or lookup directive) must be specified in the\n"+
+						"`apple_id` block or it must exist in the environment as AC_PASSWORD,\n"+
+						"otherwise we won't be able to authenticate with Apple to notarize.\n")
+				return 1
+			}
+
+			cfg.AppleId.Password = "@env:AC_PASSWORD"
+		}
 	}
 	if cfg.AppleId.Provider == "" {
 		cfg.AppleId.Provider = os.Getenv("AC_PROVIDER")

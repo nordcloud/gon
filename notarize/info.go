@@ -81,9 +81,21 @@ func info(ctx context.Context, uuid string, opts *Options) (*Info, error) {
 		"altool",
 		"--notarization-info",
 		uuid,
-		"-u", opts.Username,
-		"-p", opts.Password,
 		"--output-format", "xml",
+	}
+
+	if len(opts.Username) > 0 {
+		cmd.Args = append(cmd.Args,
+			"-u", opts.Username,
+			"-p", opts.Password,
+		)
+	}
+
+	if len(opts.APIKey) > 0 {
+		cmd.Args = append(cmd.Args,
+			"--apiKey", opts.APIKey,
+			"--apiIssuer", opts.APIIssuer,
+		)
 	}
 
 	// We store all output in out for logging and in case there is an error

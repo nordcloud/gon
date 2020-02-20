@@ -208,6 +208,10 @@ Supported configurations:
       variable. If this value isn't set, we'll attempt to use the `AC_PASSWORD`
       environment variable as a default.
 
+    * `api_key` (`string` _optional_) - The API key required for JWT authentication while using validation, upload, and notarization. This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys' and '~/.appstoreconnect/private_keys'. API key can be used instead of providing username and password.
+
+    * `api_issuer` (`string` _optional_ ) - The Issuer ID. Required if --api_key is specified.
+
     * `provider` (`string` _optional_) - The App Store Connect provider when using
       multiple teams within App Store Connect. If this isn't set, we'll attempt
       to read the `AC_PROVIDER` environment variable as a default.
