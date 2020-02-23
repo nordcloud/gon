@@ -95,6 +95,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 		return nil, err
 	}
 	status.Submitted(uuid)
+	time.Sleep(60 * time.Second)
 
 	// Begin polling the info. The first thing we wait for is for the status
 	// _to even exist_. While we get an error requesting info with an error
@@ -102,7 +103,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 	// this queue is hours long. We just have to wait.
 	result := &Info{RequestUUID: uuid}
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(30 * time.Second)
 		_, err := info(ctx, result.RequestUUID, opts)
 		if err == nil {
 			break
@@ -124,6 +125,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 	for {
 		// Update the info. It is possible for this to return a nil info
 		// and we dont' ever want to set result to nil so we have a check.
+		time.Sleep(15 * time.Second)
 		newResult, err := info(ctx, result.RequestUUID, opts)
 		if newResult != nil {
 			result = newResult
