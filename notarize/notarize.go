@@ -86,14 +86,33 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 		lock = &sync.Mutex{}
 	}
 
+	var uuid string
+	var err error
+	retry, retries := true, 0
+	maxRetries := 5
+
 	// First perform the upload
-	lock.Lock()
-	status.Submitting()
-	uuid, err := upload(ctx, opts)
-	lock.Unlock()
-	if err != nil {
-		return nil, err
+	for retry {
+		lock.Lock()
+		status.Submitting()
+		uuid, err = upload(ctx, opts)
+		lock.Unlock()
+
+		if err != nil {
+			if retries > maxRetries {
+				return nil, err
+			}
+			if e, ok := err.(Errors); ok && e.ContainsCode(-26000) {
+				time.Sleep(15)
+				retries++
+				continue
+			}
+
+			return nil, err
+		}
+		retry = false
 	}
+
 	status.Submitted(uuid)
 	time.Sleep(60 * time.Second)
 
@@ -102,6 +121,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 	// code of 1519 (UUID not found), then we are stuck in a queue. Sometimes
 	// this queue is hours long. We just have to wait.
 	result := &Info{RequestUUID: uuid}
+	retries = 0
 	for {
 		time.Sleep(30 * time.Second)
 		_, err := info(ctx, result.RequestUUID, opts)
@@ -114,6 +134,14 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 		if e, ok := err.(Errors); ok && e.ContainsCode(1519) {
 			continue
 		}
+		if retries > maxRetries {
+			return nil, err
+		}
+		if e, ok := err.(Errors); ok && e.ContainsCode(-26000) {
+			time.Sleep(15)
+			retries++
+			continue
+		}
 
 		// A real error, just return that
 		return result, err
@@ -122,6 +150,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 	// Now that the UUID result has been found, we poll more quickly
 	// waiting for the analysis to complete. This usually happens within
 	// minutes.
+	retries = 0
 	for {
 		// Update the info. It is possible for this to return a nil info
 		// and we dont' ever want to set result to nil so we have a check.
@@ -140,6 +169,15 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 			}
 
 			return result, err
+		}
+
+		if retries > maxRetries {
+			return result, err
+		}
+		if e, ok := err.(Errors); ok && e.ContainsCode(-26000) {
+			time.Sleep(15)
+			retries++
+			continue
 		}
 
 		status.Status(*result)
