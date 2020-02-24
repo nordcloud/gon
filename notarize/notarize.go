@@ -102,7 +102,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 			if retries > maxRetries {
 				return nil, err
 			}
-			if e, ok := err.(Errors); ok && e.ContainsCode(-26000) {
+			if e, ok := err.(Errors); ok && e.ContainsCode(-1011) {
 				time.Sleep(15)
 				retries++
 				continue
@@ -137,7 +137,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 		if retries > maxRetries {
 			return nil, err
 		}
-		if e, ok := err.(Errors); ok && e.ContainsCode(-26000) {
+		if e, ok := err.(Errors); ok && e.ContainsCode(-1011) {
 			time.Sleep(15)
 			retries++
 			continue
@@ -163,7 +163,7 @@ func Notarize(ctx context.Context, opts *Options) (*Info, error) {
 		if err != nil {
 			// This code is the network became unavailable error. If this
 			// happens then we just log and retry.
-			if e, ok := err.(Errors); ok && e.ContainsCode(-19000) {
+			if e, ok := err.(Errors); ok && e.ContainsCode(-1011) {
 				logger.Warn("error that network became unavailable, will retry")
 				goto RETRY
 			}
