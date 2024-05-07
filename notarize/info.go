@@ -66,7 +66,6 @@ func info(ctx context.Context, uuid string, opts *Options) (*Info, error) {
 		"notarytool",
 		"info",
 		uuid,
-		"--team-id", opts.Provider,
 		"--output-format", "plist",
 	}
 
@@ -74,6 +73,7 @@ func info(ctx context.Context, uuid string, opts *Options) (*Info, error) {
 		cmd.Args = append(cmd.Args,
 			"--apple-id", opts.DeveloperId,
 			"--password", opts.Password,
+			"--team-id", opts.Provider,
 		)
 	}
 

@@ -40,7 +40,6 @@ func upload(ctx context.Context, opts *Options) (string, error) {
 		filepath.Base(cmd.Path),
 		"notarytool",
 		"submit", opts.File,
-		"--team-id", opts.Provider,
 		"--output-format", "plist",
 	}
 
@@ -48,6 +47,7 @@ func upload(ctx context.Context, opts *Options) (string, error) {
 		cmd.Args = append(cmd.Args,
 			"--apple-id", opts.DeveloperId,
 			"--password", opts.Password,
+			"--team-id", opts.Provider,
 		)
 	}
 
