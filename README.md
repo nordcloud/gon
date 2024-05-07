@@ -1,3 +1,9 @@
+**Archived:** I unfortunately no longer make active use of this project
+and haven't properly maintained it since early 2022. I welcome anyone to
+fork and take over this project.
+
+-----------------------------------------------------
+
 # gon - CLI and Go Library for macOS Notarization
 
 gon is a simple, no-frills tool for
@@ -33,6 +39,7 @@ gon helps you automate the process of notarization.
     - [Prompts](#prompts)
 - [Usage with GoReleaser](#usage-with-goreleaser)
 - [Go Library](#go-library)
+- [Troubleshooting](#troubleshooting)
 - [Roadmap](#roadmap)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -57,7 +64,11 @@ The example below runs `gon` against itself to generate a zip and dmg.
 
 ## Installation
 
-To install `gon`, download the appropriate release for your platform
+The easiest way to install `gon` is via [Homebrew](https://brew.sh):
+
+    $ brew install mitchellh/gon/gon
+
+You may also download the appropriate release for your platform
 from the [releases page](https://github.com/mitchellh/gon/releases).
 These are all signed and notarized to run out of the box on macOS 10.15+.
 
@@ -144,6 +155,7 @@ bundle_id = "com.mitchellh.example.terraform"
 apple_id {
   username = "mitchell@example.com"
   password = "@env:AC_PASSWORD"
+  provider = "UL304B4VGY"
 }
 
 sign {
@@ -166,7 +178,8 @@ zip {
     "bundle_id" : "com.mitchellh.example.terraform",
     "apple_id": {
         "username" : "mitchell@example.com",
-        "password":  "@env:AC_PASSWORD"
+        "password":  "@env:AC_PASSWORD",
+        "provider":  "UL304B4VGY"
     },
     "sign" :{
         "application_identity" : "Developer ID Application: Mitchell Hashimoto"
@@ -208,11 +221,14 @@ Supported configurations:
       variable. If this value isn't set, we'll attempt to use the `AC_PASSWORD`
       environment variable as a default.
 
+      **NOTE**: If you have 2FA enabled, the password must be an application password, not
+      your normal apple id password. See [Troubleshooting](#troubleshooting) for details.
+
     * `api_key` (`string` _optional_) - The API key required for JWT authentication while using validation, upload, and notarization. This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys' and '~/.appstoreconnect/private_keys'. API key can be used instead of providing username and password.
 
     * `api_issuer` (`string` _optional_ ) - The Issuer ID. Required if --api_key is specified.
 
-    * `provider` (`string` _optional_) - The App Store Connect provider when using
+    * `provider` (`string`) - The App Store Connect provider when using
       multiple teams within App Store Connect. If this isn't set, we'll attempt
       to read the `AC_PROVIDER` environment variable as a default.
 
@@ -419,6 +435,12 @@ The libraries exposed are purposely lower level and separate out the sign,
 package, notarization, and stapling steps. This lets you integrate this
 functionality into any tooling easily vs. having an opinionated `gon`-CLI
 experience.
+
+## Troubleshooting
+
+### "We are unable to create an authentication session. (-22016)"
+
+You likely have Apple 2FA enabled. You'll need to [generate an application password](https://appleid.apple.com/account/manage) and use that instead of your Apple ID password.
 
 ## Roadmap
 
