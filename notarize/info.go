@@ -80,6 +80,7 @@ func info(ctx context.Context, uuid string, opts *Options) (*Info, error) {
 	if len(opts.APIKey) > 0 {
 		cmd.Args = append(cmd.Args,
 			"--key-id", opts.APIKey,
+			"--key", fmt.Sprintf("~/.appstoreconnect/private_keys/AuthKey_%s.p8", opts.APIKey),
 			"--issuer", opts.APIIssuer,
 		)
 	}
