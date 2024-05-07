@@ -79,7 +79,7 @@ func info(ctx context.Context, uuid string, opts *Options) (*Info, error) {
 
 	if len(opts.APIKey) > 0 {
 		cmd.Args = append(cmd.Args,
-			"--key", opts.APIKey,
+			"--key-id", opts.APIKey,
 			"--issuer", opts.APIIssuer,
 		)
 	}
