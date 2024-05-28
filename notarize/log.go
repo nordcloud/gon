@@ -69,9 +69,22 @@ func log(ctx context.Context, uuid string, opts *Options) (*Log, error) {
 		"notarytool",
 		"log",
 		uuid,
-		"--apple-id", opts.DeveloperId,
-		"--password", opts.Password,
-		"--team-id", opts.Provider,
+	}
+
+	if len(opts.DeveloperId) > 0 {
+		cmd.Args = append(cmd.Args,
+			"--apple-id", opts.DeveloperId,
+			"--password", opts.Password,
+			"--team-id", opts.Provider,
+		)
+	}
+
+	if len(opts.APIKey) > 0 {
+		cmd.Args = append(cmd.Args,
+			"--key-id", opts.APIKey,
+			"--key", fmt.Sprintf("~/.appstoreconnect/private_keys/AuthKey_%s.p8", opts.APIKey),
+			"--issuer", opts.APIIssuer,
+		)
 	}
 
 	// We store all output in out for logging and in case there is an error
